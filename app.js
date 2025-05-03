@@ -1,19 +1,34 @@
 const express = require("express");
 const app = express();
 
-app.use("/admin", (req, res) => {
-  //In Route Handler order of execution is important
-  // If you put this route handler first, it will match all requests to /admin and not reach the next one.
+// app.use("/admin", (req, res) => {
+//   //In Route Handler order of execution is important
+//   // If you put this route handler first, it will match all requests to /admin and not reach the next one.
+//   res.send("Hello Admin!");
+// });
+app.get("/admin", (req, res) => {
+  res.send({ firstName: "John", lastName: "Doe" });
+});
+
+app.post("/admin", (req, res) => {
+  res.send("data posted to admin!");
+});
+
+app.get("/admin/:id", (req, res) => {
+  res.send(`Hello Admin ${req.params.id}`);
+});
+
+app.get("/ad?min", (req, res) => {
+  // ? means the previous character is optional
   res.send("Hello Admin!");
 });
-app.use("/admin/2", (req, res) => {
-  res.send("Hello Hello Hello!");
+app.get("/ad*min", (req, res) => {
+  // * means the previous character can be repeated 0 or more times
+  res.send("Hello Admin!");
 });
-app.use("/dashboard", (req, res) => {
-  res.send("Hello dashboard!");
-});
-app.use("/dashboard/2", (req, res) => {
-  res.send("Hello from server!");
+app.get("/ad+min", (req, res) => {
+  // + means the previous character can be repeated 1 or more times
+  res.send("Hello Admin!");
 });
 
 app.listen(7777, () => {
