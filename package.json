@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/dparth8421/devTinder/issues"
   },
-  "homepage": "https://github.com/dparth8421/devTinder#readme"
+  "homepage": "https://github.com/dparth8421/devTinder#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10"
+  }
 }
