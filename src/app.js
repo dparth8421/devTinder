@@ -3,14 +3,11 @@ const connectionDB = require("./config/database");
 const User = require("./model/user");
 const app = express();
 
+app.use(express.json()); //to parse json data by express middleware
+
 app.post("/signUp", async (req, res) => {
-  //Creating a new instance of the User model
-  const user = new User({
-    firstName: "Parth",
-    lastName: "Deshpande",
-    emailId: "adb@gmail.com",
-    password: "123456",
-  });
+  const user = new User(req.body); //create a new user object dynamically
+  //req.body is the data we are sending from postman
   try {
     await user.save(); //return a promise thats why we are using await
     res.send("User created successfully");
