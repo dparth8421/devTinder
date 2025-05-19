@@ -80,10 +80,22 @@ app.delete("/deleteUser", async (req, res) => {
 });
 
 //update user
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   const data = req.body;
+
   try {
+    const allowedUpdates = ["photoUrl", "about", "skills", "gender", "age"];
+
+    const isUpdateAllowed = Object.keys(data).every((update) =>
+      allowedUpdates.includes(update)
+    );
+    if (!isUpdateAllowed) {
+      return res.status(400).send("Invalid update fields");
+    }
+    if (data?.skills.length > 5) {
+      throw new Error("Skills should not be greater than 5");
+    }
     const user = await User.findByIdAndUpdate(userId, data, {
       runValidators: true,
     });
@@ -93,7 +105,7 @@ app.patch("/user", async (req, res) => {
       res.status(200).send("User updated successfully");
     }
   } catch (err) {
-    res.status(500).send("Error updating user");
+    res.status(500).send("Error updating user" + err.message);
   }
 });
 
