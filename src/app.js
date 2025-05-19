@@ -12,7 +12,7 @@ app.post("/signUp", async (req, res) => {
     await user.save(); //return a promise thats why we are using await
     res.send("User created successfully");
   } catch (err) {
-    res.status(500).send("Error creating user");
+    res.status(400).send("could not create user" + err.message);
   }
 });
 
@@ -31,6 +31,24 @@ app.get("/user", async (req, res) => {
   }
 });
 
+//find user by id
+app.get("/userId", async (req, res) => {
+  const userId = req.body._id;
+  console.log(userId);
+  try {
+    const user = await User.findById(userId);
+    {
+      if (!user) {
+        return res.status(404).send("User not found");
+      } else {
+        res.status(200).send(user);
+      }
+    }
+  } catch (err) {
+    res.status(500).send("Error fetching user");
+  }
+});
+
 //Feed api - get all users
 app.get("/feed", async (req, res) => {
   try {
@@ -42,6 +60,40 @@ app.get("/feed", async (req, res) => {
     }
   } catch (err) {
     res.status(500).send("Error fetching users");
+  }
+});
+
+//delete user
+app.delete("/deleteUser", async (req, res) => {
+  const userId = req.body.userId;
+  try {
+    const user = await User.findByIdAndDelete(userId);
+    console.log(user);
+    if (!user) {
+      return res.status(404).send("User not found");
+    } else {
+      res.status(200).send("User deleted successfully");
+    }
+  } catch (err) {
+    res.status(500).send("Error deleting user");
+  }
+});
+
+//update user
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  try {
+    const user = await User.findByIdAndUpdate(userId, data, {
+      runValidators: true,
+    });
+    if (!user) {
+      return res.status(404).send("User not found");
+    } else {
+      res.status(200).send("User updated successfully");
+    }
+  } catch (err) {
+    res.status(500).send("Error updating user");
   }
 });
 
