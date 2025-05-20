@@ -17,6 +17,11 @@ const userSchema = mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid Email");
+        }
+      },
     },
     password: {
       type: String,
@@ -39,6 +44,11 @@ const userSchema = mongoose.Schema(
       type: String,
       default:
         "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.transparentpng.com%2Fcats%2Fuser-2132.html&psig=AOvVaw2mbqrQMNuSsiULnBF9rY7G&ust=1747733007863000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCPjWnoObr40DFQAAAAAdAAAAABAE",
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid URL");
+        }
+      },
     },
     about: {
       type: String,
