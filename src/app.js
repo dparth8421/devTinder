@@ -1,18 +1,32 @@
 const express = require("express");
 const connectionDB = require("./config/database");
 const User = require("./model/user");
+const { validateSignUpData } = require("./utils/validation");
 const app = express();
+const bycrpt = require("bcrypt");
 
 app.use(express.json()); //to parse json data by express middleware
 
 app.post("/signUp", async (req, res) => {
-  const user = new User(req.body); //create a new user object dynamically
+  //const user = new User(req.body); //create a new user object dynamically
   //req.body is the data we are sending from postman
   try {
+    validateSignUpData(req); //validate the data
+
+    const { firstName, lastName, emailId, password } = req.body;
+    const passwordHash = await bycrpt.hash(password, 10); //hash the password
+
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordHash,
+    });
+
     await user.save(); //return a promise thats why we are using await
     res.send("User created successfully");
   } catch (err) {
-    res.status(400).send("could not create user" + err.message);
+    res.status(400).send("Error" + err.message);
   }
 });
 
