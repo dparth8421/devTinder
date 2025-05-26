@@ -4,8 +4,12 @@ const User = require("./model/user");
 const { validateSignUpData } = require("./utils/validation");
 const app = express();
 const bycrpt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const { userAuth } = require("./Middlewares/auth");
 
 app.use(express.json()); //to parse json data by express middleware
+app.use(cookieParser());
 
 app.post("/signUp", async (req, res) => {
   //const user = new User(req.body); //create a new user object dynamically
@@ -39,6 +43,11 @@ app.post("/login", async (req, res) => {
     }
     const isPasswordValid = await bycrpt.compare(password, user.password);
     if (isPasswordValid) {
+      const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$123", {
+        expiresIn: "1h",
+      }); //sign the token with user id and secret key
+
+      res.cookie("token", token);
       res.status(200).send("Login successful");
     } else {
       res.status(401).send("Invalid cridentials");
@@ -46,6 +55,35 @@ app.post("/login", async (req, res) => {
   } catch (err) {
     res.status(500).send("Error logging in: " + err.message);
   }
+});
+
+//profile
+app.get("/profile", userAuth, async (req, res) => {
+  try {
+    // const cookies = req.cookies;
+
+    // const { token } = cookies;
+    // const decodedToken = jwt.verify(token, "DEV@Tinder$123");
+    // const { _id } = decodedToken;
+    const user = req.user;
+    res.send(user);
+    // if (!user) {
+    //   return res.status(404).send("User not found");
+    // } else {
+    //   res.status(200).send(user);
+    // }
+  } catch (err) {
+    res.status(500).send("Error fetching profile: " + err.message);
+  }
+});
+
+//sendConnnectionRequest
+
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  const user = req.user;
+  console.log("sendConnectionRequest");
+
+  res.send(user.firstName + " sent connection req!!!!");
 });
 
 //User
