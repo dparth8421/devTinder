@@ -41,13 +41,9 @@ app.post("/login", async (req, res) => {
     if (!user) {
       return res.status(404).send("User not found");
     }
-    const isPasswordValid = await bycrpt.compare(password, user.password);
+    const isPasswordValid = await user.validatePassword(password);
     if (isPasswordValid) {
-      const token = await jwt.sign({ _id: user._id }, "DEV@Tinder$123", {
-        expiresIn: "1h",
-      }); //sign the token with user id and secret key
-
-      res.cookie("token", token);
+      const token = await user.getJWT(); //get the jwt token from user model
       res.status(200).send("Login successful");
     } else {
       res.status(401).send("Invalid cridentials");
