@@ -68,8 +68,9 @@ const userSchema = mongoose.Schema(
 userSchema.methods.getJWT = async function () {
   const user = this;
   const token = jwt.sign({ _id: user._id }, "DEV@Tinder$123", {
-    expiresIn: "1h",
+    expiresIn: "7d",
   }); //sign the token with user id and secret key
+  return token;
 };
 
 userSchema.methods.validatePassword = async function (passwordInputByUser) {

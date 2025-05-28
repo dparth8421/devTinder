@@ -7,80 +7,18 @@ const bycrpt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const { userAuth } = require("./Middlewares/auth");
+const authRouter = require("./routes/auth");
+const profileRouter = require("./routes/profile");
+const requestRouter = require("./routes/request");
 
 app.use(express.json()); //to parse json data by express middleware
 app.use(cookieParser());
 
-app.post("/signUp", async (req, res) => {
-  //const user = new User(req.body); //create a new user object dynamically
-  //req.body is the data we are sending from postman
-  try {
-    validateSignUpData(req); //validate the data
 
-    const { firstName, lastName, emailId, password } = req.body;
-    const passwordHash = await bycrpt.hash(password, 10); //hash the password
 
-    const user = new User({
-      firstName,
-      lastName,
-      emailId,
-      password: passwordHash,
-    });
 
-    await user.save(); //return a promise thats why we are using await
-    res.send("User created successfully");
-  } catch (err) {
-    res.status(400).send("Error" + err.message);
-  }
-});
+app.use("/",authRouter, profileRouter,requestRouter);
 
-app.post("/login", async (req, res) => {
-  try {
-    const { emailId, password } = req.body;
-    const user = await User.findOne({ emailId: emailId });
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    const isPasswordValid = await user.validatePassword(password);
-    if (isPasswordValid) {
-      const token = await user.getJWT(); //get the jwt token from user model
-      res.status(200).send("Login successful");
-    } else {
-      res.status(401).send("Invalid cridentials");
-    }
-  } catch (err) {
-    res.status(500).send("Error logging in: " + err.message);
-  }
-});
-
-//profile
-app.get("/profile", userAuth, async (req, res) => {
-  try {
-    // const cookies = req.cookies;
-
-    // const { token } = cookies;
-    // const decodedToken = jwt.verify(token, "DEV@Tinder$123");
-    // const { _id } = decodedToken;
-    const user = req.user;
-    res.send(user);
-    // if (!user) {
-    //   return res.status(404).send("User not found");
-    // } else {
-    //   res.status(200).send(user);
-    // }
-  } catch (err) {
-    res.status(500).send("Error fetching profile: " + err.message);
-  }
-});
-
-//sendConnnectionRequest
-
-app.post("/sendConnectionRequest", userAuth, async (req, res) => {
-  const user = req.user;
-  console.log("sendConnectionRequest");
-
-  res.send(user.firstName + " sent connection req!!!!");
-});
 
 //User
 app.get("/user", async (req, res) => {
