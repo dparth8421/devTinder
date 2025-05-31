@@ -3,14 +3,17 @@ const mongoose = require("mongoose");
 const connectionRequestSchema = mongoose.Schema({
     fromUserId: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "User", // Reference to the User model
         required: true
     },
     toUserId:{
         type:mongoose.Schema.Types.ObjectId,
+        ref: "User", // Reference to the User model
         required: true
     },
     status:{
         type:String,
+        required: true,
         enum:{
             values:["ignored","interested","accepted","rejected"],
             message:`{VALUE} incorrect status type`
@@ -18,7 +21,7 @@ const connectionRequestSchema = mongoose.Schema({
         
     }
 },{
-    timeStamps: true
+    timestamps: true
 })
 
 connectionRequestSchema.index({ fromUserId: 1, toUserId: 1 });
