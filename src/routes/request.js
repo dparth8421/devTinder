@@ -7,7 +7,6 @@ const requestRouter = express.Router();
 
 //sendConnnectionRequest
 
-const USER_SAFE_DATA = "firstName lastName email age photoUrl about skills";
 
 requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req, res) => {
     try{
@@ -105,48 +104,6 @@ requestRouter.post(
   }
 );
 
-//get all recieved request
-requestRouter.get("/user/requests/recieved", userAuth, async (req, res)=>{
-  try{
-    const loggedInUser = req.user;
-    const connectionRequest = await ConnectionRequestModel.find({
-      toUserId: loggedInUser._id,
-      status: "interested",
-    }).populate("fromUserId","firstName lastName")
-
-    res.json({
-      message: "Recieved connection requests fetched successfully.",
-      data: connectionRequest,
-      success: true
-    })
-  }catch(err){
-    res.status(400).send("Error fetching recieved connection requests: " + err.message);
-  }
-})
-
-requestRouter.get("/user/connections",userAuth, async (req, res)=>{
-  try{
-    const loggedInUser = req.user;
-
-    const connectionRequests = await ConnectionRequestModel.find({
-      $or:[
-        {toUserId: loggedInUser._id, status: "accepted"},
-        {fromUserId: loggedInUser._id, status: "accepted"}]
-    }).populate("fromUserId", USER_SAFE_DATA ).populate("toUserId", USER_SAFE_DATA);
-
-    const data = connectionRequests.map((row) =>row.fromUserId._id.equals(loggedInUser._id) ? row.toUserId : row.fromUserId
-    )
-
-    res.json({
-      message: "My Connecitons!",
-      data: data,
-      success: true
-    })
-
-  }catch(err){
-res.status(400).send("Error fetching connections: " + err.message);
-  }
-})
 
 
 

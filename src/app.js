@@ -1,15 +1,19 @@
 const express = require("express");
 const connectionDB = require("./config/database");
 const User = require("./model/user");
-const { validateSignUpData } = require("./utils/validation");
 const app = express();
-const bycrpt = require("bcrypt");
 const cookieParser = require("cookie-parser");
-const jwt = require("jsonwebtoken");
-const { userAuth } = require("./Middlewares/auth");
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
+const userRouter = require("./routes/user");
+
+const cors = require("cors");
+
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true, 
+}))
 
 app.use(express.json()); //to parse json data by express middleware
 app.use(cookieParser());
@@ -17,7 +21,7 @@ app.use(cookieParser());
 
 
 
-app.use("/",authRouter, profileRouter,requestRouter);
+app.use("/",authRouter, profileRouter,requestRouter, userRouter);
 
 
 //User
@@ -53,19 +57,7 @@ app.get("/userId", async (req, res) => {
   }
 });
 
-//Feed api - get all users
-app.get("/feed", async (req, res) => {
-  try {
-    const users = await User.find();
-    if (!users) {
-      return res.status(404).send("No users found");
-    } else {
-      res.status(200).send(users);
-    }
-  } catch (err) {
-    res.status(500).send("Error fetching users");
-  }
-});
+
 
 //delete user
 app.delete("/deleteUser", async (req, res) => {
